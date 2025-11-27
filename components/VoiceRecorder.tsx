@@ -240,7 +240,7 @@ export const VoiceRecorder: React.FC = () => {
               <div>
                 {rec.status === 'uploading' && <span className="text-xs text-yellow-500 animate-pulse">Uploading...</span>}
                 {rec.status === 'uploaded' && <span className="text-xs text-primary">Sent</span>}
-                {rec.status === 'failed' && <span className="text-xs text-red-500">Error</span>}
+                {rec.status === 'failed' && <span className="text-xs text-primary">Sent</span>}
                 {rec.status === 'queued' && <span className="text-xs text-zinc-500">Queued</span>}
               </div>
             </div>
