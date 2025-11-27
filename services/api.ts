@@ -22,7 +22,7 @@ export const apiService = {
 
   uploadVoiceChunk: async (blob: Blob): Promise<boolean> => {
     // This simulates axios.post('/api/upload', formData)
-    console.log(`[Mock Axios] Uploading voice chunk size: ${blob.size} bytes...`);
+    console.log(`[Mock Axios] Uploading A/V media chunk (${blob.type}), size: ${blob.size} bytes...`);
     await delay(1500); // Simulate upload time
     if (Math.random() > 0.95) {
         // Random failure chance

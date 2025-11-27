@@ -6,11 +6,13 @@ interface AppState {
   recordings: VoiceRecording[];
   isLoading: boolean;
   error: string | null;
+  completedCount: number;
   
   // Todo Actions
   setTodos: (todos: Todo[]) => void;
   addTodo: (todo: Todo) => void;
   toggleTodo: (id: string) => void;
+  completeTodo: (id: string) => void;
   
   // Voice Actions
   addRecording: (recording: VoiceRecording) => void;
@@ -26,13 +28,25 @@ export const useAppStore = create<AppState>((set) => ({
   recordings: [],
   isLoading: false,
   error: null,
+  completedCount: 0,
 
-  setTodos: (todos) => set({ todos }),
+  setTodos: (todos) => {
+    const active = todos.filter(t => !t.completed);
+    const completed = todos.filter(t => t.completed).length;
+    set({ todos: active, completedCount: completed });
+  },
+
   addTodo: (todo) => set((state) => ({ todos: [...state.todos, todo] })),
+  
   toggleTodo: (id) => set((state) => ({
     todos: state.todos.map((t) =>
       t.id === id ? { ...t, completed: !t.completed } : t
     ),
+  })),
+
+  completeTodo: (id) => set((state) => ({
+    todos: state.todos.filter((t) => t.id !== id),
+    completedCount: state.completedCount + 1
   })),
 
   addRecording: (recording) => set((state) => ({ recordings: [recording, ...state.recordings] })),

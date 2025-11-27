@@ -6,9 +6,10 @@ import { useAppStore } from './store/useStore';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.VOICE);
-  const { todos } = useAppStore();
+  const { todos, completedCount } = useAppStore();
 
-  const completedCount = todos.filter(t => t.completed).length;
+  const totalTasks = todos.length + completedCount;
+  const progressPercentage = totalTasks > 0 ? (completedCount / totalTasks) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-background text-zinc-100 font-sans flex flex-col md:flex-row max-w-6xl mx-auto shadow-2xl overflow-hidden md:h-screen">
@@ -63,12 +64,12 @@ const App: React.FC = () => {
            <div className="text-xs text-zinc-500 mb-1">Today's Progress</div>
            <div className="flex items-end gap-1 mb-2">
              <span className="text-2xl font-bold text-white">{completedCount}</span>
-             <span className="text-sm text-zinc-500 mb-1">/ {todos.length}</span>
+             <span className="text-sm text-zinc-500 mb-1">/ {totalTasks}</span>
            </div>
            <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
              <div 
                 className="h-full bg-secondary transition-all duration-500"
-                style={{ width: `${todos.length > 0 ? (completedCount / todos.length) * 100 : 0}%` }}
+                style={{ width: `${progressPercentage}%` }}
              ></div>
            </div>
         </div>

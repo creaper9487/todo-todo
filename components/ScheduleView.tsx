@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useStore';
 import { apiService } from '../services/api';
 import { Todo } from '../types';
 
 export const ScheduleView: React.FC = () => {
-  const { todos, setTodos, setLoading } = useAppStore();
+  const { todos, setTodos, setLoading, completeTodo } = useAppStore();
+  const [exitingIds, setExitingIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const loadTodos = async () => {
@@ -21,6 +22,23 @@ export const ScheduleView: React.FC = () => {
     loadTodos();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run once on mount
+
+  const handleCardClick = (id: string) => {
+    if (exitingIds.has(id)) return;
+
+    // Start exit animation
+    setExitingIds(prev => new Set(prev).add(id));
+
+    // Wait for animation to finish then remove from store
+    setTimeout(() => {
+      completeTodo(id);
+      setExitingIds(prev => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    }, 500);
+  };
 
   // Generate hours 0-23
   const hours = Array.from({ length: 24 }, (_, i) => i);
@@ -59,25 +77,26 @@ export const ScheduleView: React.FC = () => {
                {/* Task Area - Grid for max 4 columns */}
                <div className="flex-1 border-t border-zinc-800 pt-2 pb-4">
                  <div className="grid grid-cols-4 gap-2">
-                   {hourTodos.slice(0, 4).map((todo) => (
-                     <div 
-                        key={todo.id} 
-                        className={`p-3 rounded-md border border-zinc-700/50 shadow-sm relative overflow-hidden group/card hover:border-zinc-500 transition-colors ${todo.completed ? 'opacity-50' : ''}`}
-                     >
-                        <div className={`absolute top-0 left-0 w-1 h-full ${todo.color || 'bg-zinc-600'}`}></div>
-                        <h4 className={`text-xs font-medium text-zinc-200 truncate ${todo.completed ? 'line-through decoration-zinc-500' : ''}`}>
-                          {todo.title}
-                        </h4>
-                        <div className="mt-1 flex items-center justify-between">
-                             <input 
-                                type="checkbox" 
-                                checked={todo.completed} 
-                                readOnly 
-                                className="w-3 h-3 rounded border-zinc-600 bg-transparent checked:bg-emerald-500 accent-emerald-500"
-                             />
-                        </div>
-                     </div>
-                   ))}
+                   {hourTodos.slice(0, 4).map((todo) => {
+                     const isExiting = exitingIds.has(todo.id);
+                     return (
+                       <div 
+                          key={todo.id} 
+                          onClick={() => handleCardClick(todo.id)}
+                          className={`
+                            p-3 rounded-md border border-zinc-700/50 shadow-sm relative overflow-hidden group/card 
+                            transition-all duration-500 ease-in-out cursor-pointer
+                            hover:border-zinc-500 hover:scale-[1.02] hover:bg-zinc-800/30
+                            ${isExiting ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}
+                          `}
+                       >
+                          <div className={`absolute top-0 left-0 w-1 h-full ${todo.color || 'bg-zinc-600'}`}></div>
+                          <h4 className="text-xs font-medium text-zinc-200 truncate">
+                            {todo.title}
+                          </h4>
+                       </div>
+                     );
+                   })}
                    {/* Placeholder if empty but in work hours */}
                    {hourTodos.length === 0 && (
                      <div className="col-span-4 h-full min-h-[2rem] border border-dashed border-zinc-800/50 rounded flex items-center justify-center">
