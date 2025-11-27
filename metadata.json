@@ -1,0 +1,7 @@
+{
+  "name": "ChronoVoice & Tasker",
+  "description": "A dual-purpose productivity app featuring a long-session voice recorder that auto-uploads chunks every 20 minutes, and a time-boxed todo list scheduler.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
